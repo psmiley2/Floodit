@@ -53,7 +53,7 @@ class GridGame:
         self.generation = 1
         self.max_generations = 300
 
-        self.mutation_rate = .08
+        self.mutation_rate = .05
 
         self.textbox = self.c.create_text(width*size+TEXT_W/2.+BORDER*2, BORDER+height*size/2., text="",width=TEXT_W,justify=tk.LEFT)
         self.change_text("Hello!")
@@ -232,10 +232,10 @@ class GridGame:
 
             if (x != self.width - 1 and (x + 1, y) not in already_checked):
                 q.put((x + 1, y))
-                already_checked.append((xpos + 1, y))
+                already_checked.append((x + 1, y))
             if (y != self.height - 1 and (x, y + 1) not in already_checked):
                 q.put((x, y + 1))
-                already_checked.append((xpos, y + 1))
+                already_checked.append((x, y + 1))
             if (y != 0 and (x, y - 1) not in already_checked):
                 q.put((x, y - 1))
                 already_checked.append((x, y - 1))
@@ -297,7 +297,7 @@ class GridGame:
             self.agent_number += 1
             first = False
             left_over_moves = 0
-            self.new_game() # will need to change this if playing in hard mode
+            self.new_game() 
 
 
         print("high_score: ", self.high_score)
@@ -419,17 +419,7 @@ class GridGame:
         if self.first_run == True:
             self.first_run = False
             self.population([])
-
-    def start_game(self, key):
-        self.move_count = 0
-        self.new_game
-        self.change_text(("Moves: ", self.move_count, " / ", self.total_moves))
         
-
-    def tutorial(self):
-        # add your tutorial code here
-        self.change_text("TUTORIAL:\nWelcome to Flood\nThe colored tile in the top left corner of the board is part of your flood\nIf you click a colored tile on the screen that is a different color than your flood, your flood will become that color\nAny pieces that bordered your flood and that are the same color as your flood are now also part of your flood\nYour goal is to add all of the tiles to your flood without using the max number of moves\nUse the practice board to the left to get a feel for how to play the game.\nYou may also press space to reset the game\n\nPress '/' to recieve a hint.\n\nPress the Space Bar to exit the tutorial and start playing the game!")
-
 if __name__=="__main__":
     ap = argparse.ArgumentParser(description='Play a game; choose your difficulty')
     ap.add_argument("--hard", dest="hardmode", action="store_true",default=False, help="Play a harder version of the game.")
@@ -439,8 +429,5 @@ if __name__=="__main__":
     g = GridGame(12, 12, 50) #rows,columns,cell size
 
     g.new_game()
-    
-    t = threading.Thread(target=g.tutorial)
-    t.start()
     g.start()
-    t.join()
+    
