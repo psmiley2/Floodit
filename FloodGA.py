@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 # Assistive Algorithms Assignment 8: Intelligent Tutoring Systems
-# Some code to get you started
-# (c) 2020 Elaine Short
+# Starter Code by (c) 2020 Elaine Short: http://eshort.tech 
+# Non Tkinter related code by (c) 2020 Peter Smiley
 
 import tkinter as tk
 import threading
@@ -22,48 +22,44 @@ class GridGame:
     
     #builds a grid of a given width and height
     def __init__(self, width, height, size):
-        self.root = tk.Tk()
 
+        # Variable to build board skeleton
+        self.root = tk.Tk()
         self.c = tk.Canvas(self.root, width=width*size+4*BORDER+TEXT_W,
                                height=max(height*size+2*BORDER,TEXT_H+2*BORDER))
-
         self.gridsize = size
         self.c.pack()
-
         self.cells = {}
         self.edges = {}
         self.corners = {}
         self.centers = {}
-
         self.width = width
         self.height = height
-
-        self.flood_color = ""
-        self.board_colors = [[]]
-
-        self.keylist = []
-        self.move_count = 0
-        self.total_moves = 0
-
-        self.population_size = 20
-        self.agent_number = 1
-
-        self.flood_size = 1
-        self.first_run = True
-        self.generation = 1
-        self.max_generations = 300
-
-        self.mutation_rate = .05
-
         self.textbox = self.c.create_text(width*size+TEXT_W/2.+BORDER*2, BORDER+height*size/2., text="",width=TEXT_W,justify=tk.LEFT)
-        self.change_text("Hello!")
 
+        # Variables to build FloodIt Game + Solve Algorithm
+        self.board_colors = [[]]
+        self.keylist = []
+        self.board_size = self.height * self.width
+
+        # Game State
         self.high_score = 0
         self.won = False
+        self.generation = 1
+        self.flood_size = 1
+        self.first_run = True
+        self.move_count = 0
+        self.total_moves = 0
+        self.flood_color = ""
+        self.agent_number = 1
 
-        self.board_size = self.height * self.width
+        # Variables that can be tuned to optimize performance
+        self.population_size = 20
+        self.mutation_rate = .05
+        self.max_generations = 300
+
         
-        
+        # Builds board skeleton
         for i in range(0,height):
             for j in range(0,width):
                 x,y = self.get_grid_corner(i,j)
@@ -111,8 +107,7 @@ class GridGame:
                         self.edges[cell[name]].append((i,j,nb_edge_dir))
 
                 #add corners, invisibly small at first, making sure not to
-                #add duplicates
-                                    
+                #add duplicates            
                 for name,direction in corner_dirs.items():
                     neighbors = direction[0]
                     corner_to_cell_dir = direction[1]
@@ -189,7 +184,6 @@ class GridGame:
         if self.flood_size == self.board_size:
             if (self.won == False):
                 self.change_text("Congratulations. You have won the game!")
-                print ("YOU HAVE WON THE GAME !!!!!!\n\n\n\n\n\n\n")
                 self.won = True
             else:
                 if self.move_count < self.high_score:
@@ -203,6 +197,7 @@ class GridGame:
         possible_clicks = list(self.centers.keys())
         for i in range(len(child)):
             if random() < self.mutation_rate:
+                # Will change click to a random click
                 child[i] = choice(possible_clicks)
         return child
                 
@@ -210,11 +205,14 @@ class GridGame:
         chop = randrange(0, self.total_moves)
         child = agent_A[:chop]
         b = agent_B[chop:]
+        # Merge the parts from both agents
         for i in b:
             child.append(i)        
         child = self.mutate(child)
         return child
 
+    # If the agent clicks the flood, it will find the non-flood tile that is closest and
+    # click on that instead
     def transform_click_to_closest(self, xpos, ypos):
         already_checked = []
         q = Queue(maxsize = (self.width * self.height) * 1000)
@@ -267,9 +265,11 @@ class GridGame:
             for click in agent:
                 self.handle_center_click(click)
                 self.change_text(("Moves: ", self.move_count, " / ", self.total_moves, "\nGeneration = ", self.generation, "\nFlood Size = ", self.flood_size, "\nAgent #", self.agent_number))
-                # if first == True:
-                # self.root.update()
-                # time.sleep(.1)
+                
+                # Prints the best agents from each generation
+                if first == True:
+                    self.root.update()
+                    time.sleep(.1)
 
                 if self.check_win() == True:
                     left_over_moves = self.total_moves - self.move_count
@@ -299,8 +299,8 @@ class GridGame:
             left_over_moves = 0
             self.new_game() 
 
-
         print("high_score: ", self.high_score)
+
         #Make new population
         next_gen.append(best_agent)
         for i in range(1, self.population_size):
@@ -332,6 +332,7 @@ class GridGame:
         for i in range(len(x)):
             q.put((x[i], y[i]))
 
+        # Uses a queue to simulate recursion. Finds all chained connected colors
         while not q.empty():
             piece = q.get()
             if (not piece[0] == 0):
@@ -369,9 +370,7 @@ class GridGame:
         self.move_count += 1
         self.change_text(("Moves: ", self.move_count, " / ", self.total_moves))
 
-        
-        
-
+    # Sets the actual colors in the tkinter board to the selected board colors
     def initialize_colors(self):
         index = 0
         for idx in self.centers.keys():
@@ -381,10 +380,7 @@ class GridGame:
         self.flood_color = self.board_colors[0][0]
 
     def new_game(self):
-        #runs before starting the game; you can use this to set up the game
-
-        #easy = 23. hard = 19
-        self.total_moves = 19
+        self.total_moves = 23
 
         y = "yellow"
         p = "purple"
@@ -393,7 +389,7 @@ class GridGame:
         o = "orange"
         b = "blue"
 
-        # Small
+        # Hard Coded sample board
         self.board_colors = [[y,o,p,b,o,y,o,o,g,r,g,y],
                             [g,y,o,r,y,p,r,p,p,b,p,y],
                             [b,o,o,o,b,o,r,g,r,b,r,o],
@@ -406,8 +402,6 @@ class GridGame:
                             [o,b,o,r,o,o,b,g,y,r,b,r],
                             [r,o,o,g,g,y,o,r,o,o,y,g],
                             [o,p,g,r,b,g,y,o,p,y,y,y]]
-
-        
 
         self.part_of_flood = np.full((self.width, self.height), False)
         self.part_of_flood[0, 0] = True

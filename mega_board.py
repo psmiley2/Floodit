@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 # Assistive Algorithms Assignment 8: Intelligent Tutoring Systems
-# Some code to get you started
-# (c) 2020 Elaine Short
+# Starter Code by (c) 2020 Elaine Short: http://eshort.tech 
+# Non Tkinter related code by (c) 2020 Peter Smiley
 
 import tkinter as tk
 import threading
